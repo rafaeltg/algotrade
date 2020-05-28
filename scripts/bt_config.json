@@ -1,0 +1,24 @@
+{
+  "data": [
+    {
+      "class_name": "YahooFinanceData",
+      "config": {
+        "dataname": "MSFT",
+        "fromdate": "2018-01-01",
+        "todate": "2020-01-01",
+        "period": "d"
+      }
+    }
+  ],
+  "broker": {
+    "class_name": "BacktestBroker",
+    "config": {
+      "cash": 10000
+    }
+  },
+  "strategy": [
+    {
+      "class_name": "LongShortStrategy"
+    }
+  ]
+}

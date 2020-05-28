@@ -1,0 +1,7 @@
+.git
+.gitignore
+.DS_Store
+**/*.pyc
+**/Dockerfile
+**/__pycache__
+**/README.md
