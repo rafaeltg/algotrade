@@ -1,5 +1,6 @@
-import backtrader as bt
+import backtrader.analyzers as bta
 
 ANALYZERS = {
-    bt.analyzers.SharpeRatio.__name__: S
+    bta.SharpeRatio.__name__: bta.SharpeRatio,
+    bta.DrawDown.__name__: bta.DrawDown
 }

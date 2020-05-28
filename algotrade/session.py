@@ -2,6 +2,7 @@ import backtrader as bt
 from .brokers import BROKERS
 from .datafeeds import DATAFEEDS
 from .strategies import STRATEGIES
+from .analyzers import ANALYZERS
 from .utils import from_config
 
 
@@ -65,7 +66,7 @@ class Session(bt.Cerebro):
 
         for s in strat:
             if 'class_name' in s:
-                strat_cls = STRATEGIES.get(s['class_name'], None)
+                strat_cls = STRATEGIES.get(s['class_name'])
                 params = s.get('params', dict())
                 self.addstrategy(strat_cls, **params)
 
@@ -75,3 +76,9 @@ class Session(bt.Cerebro):
 
         if not isinstance(analyzers, list):
             analyzers = [analyzers]
+
+        for a in analyzers:
+            if 'class_name' in a:
+                an_cls = ANALYZERS.get(a['class_name'])
+                params = a.get('params', dict())
+                self.addanalyzer(an_cls, **params)

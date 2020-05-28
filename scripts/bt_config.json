@@ -18,7 +18,17 @@
   },
   "strategy": [
     {
-      "class_name": "LongShortStrategy"
+      "class_name": "LongShortStrategy",
+      "params": {
+      }
+    }
+  ],
+  "analyzers": [
+    {
+      "class_name": "SharpeRatio"
+    },
+    {
+      "class_name": "DrawDown"
     }
   ]
 }
