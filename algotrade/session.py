@@ -1,3 +1,4 @@
+import os
 import backtrader as bt
 from .brokers import BROKERS
 from .datafeeds import DATAFEEDS
@@ -32,8 +33,8 @@ class Session(bt.Cerebro):
 
         return cfg
 
-    def processPlots(self, numfigs=1, iplot=False, start=None, end=None,
-                     width=15, height=9, dpi=350, tight=False, use=None, **kwargs):
+    def process_plots(self, numfigs=1, iplot=False, start=None, end=None,
+                      width=15, height=9, dpi=350, tight=False, use=None, outdir='', **kwargs):
 
         import matplotlib.pyplot as plt
         plt.rcParams['figure.figsize'] = [width, height]
@@ -48,18 +49,18 @@ class Session(bt.Cerebro):
         figs = []
         for stratlist in self.runstrats:
             for si, strat in enumerate(stratlist):
-                rfig = plotter.plot(strat,
-                                    figid=si * 100,
-                                    numfigs=numfigs,
-                                    iplot=iplot,
-                                    start=start,
-                                    end=end,
-                                    use=use)
-                figs.append(rfig)
+                fig = plotter.plot(strat,
+                                   figid=si * 100,
+                                   numfigs=numfigs,
+                                   iplot=iplot,
+                                   start=start,
+                                   end=end,
+                                   use=use)
+                figs.append(fig)
 
-        for fig in figs:
-            for f in fig:
-                f.savefig('result.png', tight=tight)
+                for f in fig:
+                    f.savefig(os.path.join(outdir, 'result.png'), tight=tight)
+
         return figs
 
     @classmethod

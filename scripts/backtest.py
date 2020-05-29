@@ -8,7 +8,7 @@ def run_backtest(args):
     cfg = load_json(args.config)
     s = Session.from_config(**cfg)
     s.run()
-    s.processPlots()
+    s.process_plots(outdir=args.out_dir)
 
 
 def parse_args():
@@ -21,6 +21,11 @@ def parse_args():
                         required=True,
                         default=os.environ.get('CONFIG', None),
                         help='Backtest session config')
+
+    parser.add_argument('--out_dir',
+                        required=False,
+                        type=str,
+                        default=os.environ.get('OUT_DIR', ''))
 
     return parser.parse_args()
 

@@ -6,12 +6,12 @@ from pydl.models import load_json, save_json
 from algotrade.session import Session
 
 
-def loss_fn(session_config, *args):
+def loss_fn(session_config):
     try:
         s = Session.from_config(**session_config)
         result = s.run()[0]
         res = result.analyzers.ret.get_analysis()['vwr']
-        res = np.nan if res < 0 else 1. / res
+        res = np.nan if res <= 0 else 1. / res
     except:
         res = np.nan
 
@@ -22,6 +22,9 @@ def run_optimization(args):
     cfg = load_json(args.config)
 
     opt = optimizer_from_config(cfg.get('optimizer', dict()))
+    if opt is None:
+        raise ValueError('invalid "optimizer" configuration')
+
     search_space = hp_space_from_json(cfg.get('search_space', dict()))
 
     res = opt.fmin(

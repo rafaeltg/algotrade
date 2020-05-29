@@ -10,6 +10,7 @@ class LongShortStrategy(bt.Strategy):
     """
 
     params = dict(
+        use_ema=True,
         fast_period=9,
         slow_period=15,
         stop_loss=0.2,  # price is 2% less than the entry point
@@ -30,15 +31,20 @@ class LongShortStrategy(bt.Strategy):
         # To control operation entries
         self.orderid = None
 
-        # Create SMAs
-        self.fast_sma = btind.MovAv.SMA(self.data, period=self.p.fast_period)
-        self.fast_sma.csv = self.p.csv
+        self.data_transf = btind.MovAv.EMA(self.data, period=3)
 
-        self.slow_sma = btind.MovAv.SMA(self.data, period=self.p.slow_period)
-        self.slow_sma.csv = self.p.csv
+        if self.p.use_ema:
+            self.fast_ma = btind.MovAv.EMA(self.data_transf, period=self.p.fast_period)
+            self.slow_ma = btind.MovAv.EMA(self.data_transf, period=self.p.slow_period)
+        else:
+            self.fast_ma = btind.MovAv.SMA(self.data_transf, period=self.p.fast_period)
+            self.slow_ma = btind.MovAv.SMA(self.data_transf, period=self.p.slow_period)
 
-        # Create a CrossOver Signal from close an moving average
-        self.signal = btind.CrossOver(self.fast_sma, self.slow_sma)
+        self.signal = btind.CrossOver(self.fast_ma, self.slow_ma)
+
+        self.data_transf.csv = self.p.csv
+        self.fast_ma.csv = self.p.csv
+        self.slow_ma.csv = self.p.csv
         self.signal.csv = self.p.csv
 
     def start(self):
