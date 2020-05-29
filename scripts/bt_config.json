@@ -43,5 +43,13 @@
     {
       "class_name": "VWR"
     }
+  ],
+  "writers": [
+    {
+      "class_name": "WriterFile",
+      "params": {
+        "rounding": 2
+      }
+    }
   ]
 }

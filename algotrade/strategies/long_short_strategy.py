@@ -4,8 +4,8 @@ import backtrader.indicators as btind
 
 class LongShortStrategy(bt.Strategy):
     """
-    This strategy buys/sells upong the close price crossing
-    upwards/downwards a Simple Moving Average.
+    This strategy buys/sells upon the fast sma of the close price crossing upwards/downwards a
+    slow sma of the close price.
     It can be a long-only strategy by setting the param "onlylong" to True
     """
 
@@ -14,28 +14,32 @@ class LongShortStrategy(bt.Strategy):
         slow_period=15,
         stop_loss=0.2,  # price is 2% less than the entry point
         trail=False,
-        printout=False,
         onlylong=False,
-        csvcross=False,
+        printout=False,
+        csv=False,
     )
 
     def log(self, txt, dt=None):
         if self.p.printout:
             dt = dt or self.data.datetime[0]
-            dt = bt.num2date(dt)
-            print('%s, %s' % (dt.strftime("%Y-%m-%d %H:%M"), txt))
+            if isinstance(dt, float):
+                dt = bt.num2date(dt)
+            print('[{}] {}'.format(dt.strftime("%Y-%m-%d %H:%M"), txt))
 
     def __init__(self):
         # To control operation entries
         self.orderid = None
 
         # Create SMAs
-        fast_sma = btind.MovAv.SMA(self.data, period=self.p.fast_period)
-        slow_sma = btind.MovAv.SMA(self.data, period=self.p.slow_period)
+        self.fast_sma = btind.MovAv.SMA(self.data, period=self.p.fast_period)
+        self.fast_sma.csv = self.p.csv
+
+        self.slow_sma = btind.MovAv.SMA(self.data, period=self.p.slow_period)
+        self.slow_sma.csv = self.p.csv
 
         # Create a CrossOver Signal from close an moving average
-        self.signal = btind.CrossOver(fast_sma, slow_sma)
-        self.signal.csv = self.p.csvcross
+        self.signal = btind.CrossOver(self.fast_sma, self.slow_sma)
+        self.signal.csv = self.p.csv
 
     def start(self):
         self.log('Backtesting is about to start')
@@ -49,20 +53,22 @@ class LongShortStrategy(bt.Strategy):
 
         if self.signal > 0.0:  # cross upwards
             if self.position:
-                self.log('CLOSE SHORT, %.2f' % self.data.close[0])
+                self.log('CLOSE SHORT @ %.2f' % self.data.close[0])
                 self.close()
 
-            self.log('BUY CREATE, %.2f' % self.data.close[0])
+            self.log('BUY @ %.2f' % self.data.close[0])
             buy_order = self.buy(transmit=False)
 
             if not self.p.trail:
                 stop_price = self.data.close[0] * (1.0 - self.p.stop_loss)
+                self.log('SELL STOP @ %.2f' % stop_price)
                 self.sell(
                     exectype=bt.Order.Stop,
                     price=stop_price,
                     parent=buy_order
                 )
             else:
+                self.log('SELL STOP TRAIL @ %.3f' % self.p.stop_loss)
                 self.sell(
                     exectype=bt.Order.StopTrail,
                     trailpercent=self.p.stop_loss,
@@ -71,21 +77,23 @@ class LongShortStrategy(bt.Strategy):
 
         elif self.signal < 0.0:  # cross downwards
             if self.position:
-                self.log('CLOSE LONG, %.2f' % self.data.close[0])
+                self.log('CLOSE LONG @ %.2f' % self.data.close[0])
                 self.close()
 
             if not self.p.onlylong:
-                self.log('SELL CREATE, %.2f' % self.data.close[0])
+                self.log('SELL @ %.2f' % self.data.close[0])
                 sell_order = self.sell(transmit=False)
 
                 if not self.p.trail:
                     stop_price = self.data.close[0] * (1.0 + self.p.stop_loss)
+                    self.log('BUY STOP @ %.2f' % stop_price)
                     self.buy(
                         exectype=bt.Order.Stop,
                         price=stop_price,
                         parent=sell_order
                     )
                 else:
+                    self.log('BUY STOP TRAIL @ %.3f' % self.p.stop_loss)
                     self.buy(
                         exectype=bt.Order.StopTrail,
                         trailpercent=self.p.stop_loss,
@@ -98,10 +106,10 @@ class LongShortStrategy(bt.Strategy):
 
         if order.status == order.Completed:
             if order.isbuy():
-                buytxt = 'BUY COMPLETE, %.2f' % order.executed.price
+                buytxt = 'BUY COMPLETE @ %.2f' % order.executed.price
                 self.log(buytxt, order.executed.dt)
             else:
-                selltxt = 'SELL COMPLETE, %.2f' % order.executed.price
+                selltxt = 'SELL COMPLETE @ %.2f' % order.executed.price
                 self.log(selltxt, order.executed.dt)
 
         elif order.status in [order.Expired, order.Canceled, order.Margin]:

@@ -1,18 +1,14 @@
 import argparse
 import os
-import backtrader as bt
 from pydl.models import load_json
 from algotrade.session import Session
 
 
 def run_backtest(args):
     cfg = load_json(args.config)
-
     s = Session.from_config(**cfg)
-
-    s.addwriter(bt.WriterFile, csv=True, rounding=2)
-
     s.run()
+    s.processPlots()
 
 
 def parse_args():

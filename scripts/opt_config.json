@@ -2,9 +2,9 @@
   "optimizer": {
     "class_name": "CMAES",
     "config": {
-      "pop_size": 10,
-      "max_iter": 20,
-      "verbose": 10
+      "pop_size": 20,
+      "max_iter": 40,
+      "verbose": -10
     }
   },
   "search_space": {
@@ -13,7 +13,6 @@
         "class_name": "YahooFinanceCSVData",
         "config": {
           "dataname": "/work/algotrade/data/SPY_2016-01-04_2020-03-31.csv",
-          "fromdate": "2017-01-01",
           "timeframe": 5
         }
       }
@@ -52,7 +51,18 @@
               "max_val": 0.4
             }
           },
-          "onlylong": true
+          "trail": {
+            "class_name": "BooleanParameterNode",
+            "config": {
+              "label": "trail"
+            }
+          },
+          "onlylong": {
+            "class_name": "BooleanParameterNode",
+            "config": {
+              "label": "onlylong"
+            }
+          }
         }
       }
     ],
@@ -65,7 +75,7 @@
             "config": {
               "label": "stake",
               "min_val": 1,
-              "max_val": 20
+              "max_val": 50
             }
           }
         }

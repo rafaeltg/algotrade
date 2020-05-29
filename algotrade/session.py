@@ -4,6 +4,7 @@ from .datafeeds import DATAFEEDS
 from .strategies import STRATEGIES
 from .sizers import SIZERS
 from .analyzers import ANALYZERS
+from .writers import WRITERS
 from .utils import from_config
 
 
@@ -31,6 +32,36 @@ class Session(bt.Cerebro):
 
         return cfg
 
+    def processPlots(self, numfigs=1, iplot=False, start=None, end=None,
+                     width=15, height=9, dpi=350, tight=False, use=None, **kwargs):
+
+        import matplotlib.pyplot as plt
+        plt.rcParams['figure.figsize'] = [width, height]
+        plt.rcParams['figure.dpi'] = dpi
+
+        from backtrader import plot
+        if self.p.oldsync:
+            plotter = plot.Plot_OldSync(**kwargs)
+        else:
+            plotter = plot.Plot(**kwargs)
+
+        figs = []
+        for stratlist in self.runstrats:
+            for si, strat in enumerate(stratlist):
+                rfig = plotter.plot(strat,
+                                    figid=si * 100,
+                                    numfigs=numfigs,
+                                    iplot=iplot,
+                                    start=start,
+                                    end=end,
+                                    use=use)
+                figs.append(rfig)
+
+        for fig in figs:
+            for f in fig:
+                f.savefig('result.png', tight=tight)
+        return figs
+
     @classmethod
     def from_config(cls, **cfg):
         sess = cls()
@@ -39,6 +70,7 @@ class Session(bt.Cerebro):
         sess._set_strategy(cfg.get('strategy', None))
         sess._set_strategy(cfg.get('sizers', None))
         sess._set_analyzers(cfg.get('analyzers', None))
+        sess._set_writers(cfg.get('writers', None))
         return sess
 
     def _set_data(self, data):
@@ -104,3 +136,17 @@ class Session(bt.Cerebro):
                 if an_cls is not None:
                     params = a.get('params', dict())
                     self.addanalyzer(an_cls, **params)
+
+    def _set_writers(self, writers):
+        if writers is None:
+            return
+
+        if not isinstance(writers, list):
+            writers = [writers]
+
+        for w in writers:
+            if 'class_name' in w:
+                wtr_cls = WRITERS.get(w['class_name'], None)
+                if wtr_cls is not None:
+                    params = w.get('params', dict())
+                    self.addwriter(wrtcls=wtr_cls, **params)
