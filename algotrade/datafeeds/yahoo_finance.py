@@ -4,6 +4,27 @@ import backtrader as bt
 import datetime as dt
 
 
+class YahooFinanceCSVData(bt.feeds.YahooFinanceCSVData):
+
+    def to_config(self) -> dict:
+        config = self.params._getitems()
+        config['fromdate'] = self.params.fromdate.strftime('%Y-%m-%d')
+        config['enddate'] = self.params.todate.strftime('%Y-%m-%d')
+        return config
+
+    @classmethod
+    def from_config(cls, **config):
+        fromdate = config.pop('fromdate', None)
+        if fromdate is not None:
+            fromdate = dt.datetime.strptime(fromdate, '%Y-%m-%d')
+
+        todate = config.pop('todate', None)
+        if todate is not None:
+            todate = dt.datetime.strptime(todate, '%Y-%m-%d')
+
+        return cls(fromdate=fromdate, todate=todate, **config)
+
+
 class YahooFinanceData(bt.feeds.YahooFinanceData):
 
     def start_v7(self):

@@ -1,25 +1,38 @@
 {
   "data": [
     {
-      "class_name": "YahooFinanceData",
+      "class_name": "YahooFinanceCSVData",
       "config": {
-        "dataname": "MSFT",
-        "fromdate": "2018-01-01",
-        "todate": "2020-01-01",
-        "period": "d"
+        "dataname": "/work/algotrade/data/SPY_2016-01-04_2020-03-31.csv",
+        "fromdate": "2017-01-01",
+        "timeframe": 5
       }
     }
   ],
   "broker": {
     "class_name": "BacktestBroker",
     "config": {
-      "cash": 10000
+      "cash": 10000.0
     }
   },
   "strategy": [
     {
       "class_name": "LongShortStrategy",
       "params": {
+        "fast_period": 10,
+        "slow_period": 30,
+        "trail": true,
+        "onlylong": true,
+        "printout": true,
+        "csvcross": true
+      }
+    }
+  ],
+  "sizers": [
+    {
+      "class_name": "FixedSize",
+      "params": {
+        "stake": 2
       }
     }
   ],
@@ -28,7 +41,7 @@
       "class_name": "SharpeRatio"
     },
     {
-      "class_name": "DrawDown"
+      "class_name": "VWR"
     }
   ]
 }

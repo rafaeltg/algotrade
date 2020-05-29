@@ -19,7 +19,7 @@ RUN apt-get update && \
 
 FROM pydl-builder as builder
 
-ENV PYTHONPATH /work/:$PYTHONPATH
+ENV PYTHONPATH /work/algotrade:$PYTHONPATH
 
 ADD . /work/algotrade
 WORKDIR /work/algotrade

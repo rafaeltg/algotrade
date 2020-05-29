@@ -1,0 +1,83 @@
+{
+  "optimizer": {
+    "class_name": "CMAES",
+    "config": {
+      "pop_size": 10,
+      "max_iter": 20,
+      "verbose": 10
+    }
+  },
+  "search_space": {
+    "data": [
+      {
+        "class_name": "YahooFinanceCSVData",
+        "config": {
+          "dataname": "/work/algotrade/data/SPY_2016-01-04_2020-03-31.csv",
+          "fromdate": "2017-01-01",
+          "timeframe": 5
+        }
+      }
+    ],
+    "broker": {
+      "class_name": "BacktestBroker",
+      "config": {
+        "cash": 1000000.0
+      }
+    },
+    "strategy": [
+      {
+        "class_name": "LongShortStrategy",
+        "params": {
+          "fast_period": {
+            "class_name": "IntParameterNode",
+            "config": {
+              "label": "fast_period",
+              "min_val": 5,
+              "max_val": 15
+            }
+          },
+          "slow_period": {
+            "class_name": "IntParameterNode",
+            "config": {
+              "label": "slow_period",
+              "min_val": 20,
+              "max_val": 50
+            }
+          },
+          "stop_loss": {
+            "class_name": "FloatParameterNode",
+            "config": {
+              "label": "stop_loss",
+              "min_val": 0.05,
+              "max_val": 0.4
+            }
+          },
+          "onlylong": true
+        }
+      }
+    ],
+    "sizers": [
+      {
+        "class_name": "FixedSize",
+        "params": {
+          "stake": {
+            "class_name": "IntParameterNode",
+            "config": {
+              "label": "stake",
+              "min_val": 1,
+              "max_val": 20
+            }
+          }
+        }
+      }
+    ],
+    "analyzers": [
+      {
+        "class_name": "VWR",
+        "params": {
+          "_name": "ret"
+        }
+      }
+    ]
+  }
+}

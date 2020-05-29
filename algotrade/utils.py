@@ -1,14 +1,18 @@
+
 def from_config(config: dict, **custom_objs):
     ret = None
 
     class_name = config.get("class_name", None)
     if class_name and (class_name in custom_objs):
-        ret = custom_objs[class_name]
+        cls = custom_objs[class_name]
 
         cfg = config.get("config", None)
-        if cfg and hasattr(ret, 'from_config'):
-            ret = ret.from_config(**cfg)
+        if cfg:
+            if hasattr(cls, 'from_config'):
+                ret = cls.from_config(**cfg)
+            else:
+                ret = cls(**cfg)
         else:
-            ret = ret()
+            ret = cls()
 
     return ret

@@ -5,33 +5,30 @@ from pydl.models import load_json
 from algotrade.session import Session
 
 
-def run_backtest():
-    args = parse_args()
-
-    if args is None:
-        return
-
+def run_backtest(args):
     cfg = load_json(args.config)
 
     s = Session.from_config(**cfg)
 
-    s.addwriter(bt.WriterFile, csv=True, rounding=3)
+    s.addwriter(bt.WriterFile, csv=True, rounding=2)
+
     s.run()
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        description='Sample for strategy selection'
+        description='Backtest script'
     )
 
     parser.add_argument('--config',
-                        required=False,
+                        required=True,
                         default=os.environ.get('CONFIG', None),
-                        help='session config')
+                        help='Backtest session config')
 
     return parser.parse_args()
 
 
 if __name__ == "__main__":
-    run_backtest()
+    args = parse_args()
+    run_backtest(args)
