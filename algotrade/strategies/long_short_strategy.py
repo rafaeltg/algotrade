@@ -31,18 +31,15 @@ class LongShortStrategy(bt.Strategy):
         # To control operation entries
         self.orderid = None
 
-        self.data_transf = btind.MovAv.EMA(self.data, period=3)
-
         if self.p.use_ema:
-            self.fast_ma = btind.MovAv.EMA(self.data_transf, period=self.p.fast_period)
-            self.slow_ma = btind.MovAv.EMA(self.data_transf, period=self.p.slow_period)
+            self.fast_ma = btind.MovAv.EMA(self.data.adjclose, period=self.p.fast_period)
+            self.slow_ma = btind.MovAv.EMA(self.data.adjclose, period=self.p.slow_period)
         else:
-            self.fast_ma = btind.MovAv.SMA(self.data_transf, period=self.p.fast_period)
-            self.slow_ma = btind.MovAv.SMA(self.data_transf, period=self.p.slow_period)
+            self.fast_ma = btind.MovAv.SMA(self.data.adjclose, period=self.p.fast_period)
+            self.slow_ma = btind.MovAv.SMA(self.data.adjclose, period=self.p.slow_period)
 
         self.signal = btind.CrossOver(self.fast_ma, self.slow_ma)
 
-        self.data_transf.csv = self.p.csv
         self.fast_ma.csv = self.p.csv
         self.slow_ma.csv = self.p.csv
         self.signal.csv = self.p.csv
