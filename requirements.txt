@@ -2,3 +2,5 @@ pandas
 numpy
 backtrader
 requests
+influxdb
+yfinance

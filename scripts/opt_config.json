@@ -54,7 +54,7 @@
             "config": {
               "label": "stop_loss",
               "min_val": 0.001,
-              "max_val": 0.5
+              "max_val": 0.1
             }
           },
           "trail": {

@@ -1,9 +1,12 @@
 {
   "data": [
     {
-      "class_name": "YahooFinanceCSVData",
+      "class_name": "InfluxDB",
       "config": {
-        "dataname": "/work/algotrade/data/SPY_2016-01-04_2020-03-31.csv",
+        "username": "user",
+        "password": "123mudar",
+        "database": "instruments",
+        "dataname": "SPY",
         "fromdate": "2017-01-01",
         "timeframe": 5
       }
