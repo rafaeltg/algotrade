@@ -1,38 +1,16 @@
 import backtrader as bt
-from dateutil.parser import parse
+from .utils import _parse_dates
 
 
 class YahooFinanceCSVData(bt.feeds.YahooFinanceCSVData):
 
     @classmethod
     def from_config(cls, **config):
-        fromdate = config.pop('fromdate', None)
-        if fromdate is not None:
-            fromdate = parse(fromdate)
-
-        todate = config.pop('todate', None)
-        if todate is not None:
-            todate = parse(todate)
-
-        return cls(fromdate=fromdate, todate=todate, **config)
+        return cls(**_parse_dates(config))
 
 
 class YahooFinanceData(bt.feeds.YahooFinanceData):
 
-    def to_config(self) -> dict:
-        config = self.params._getitems()
-        config['fromdate'] = self.params.fromdate.strftime('%Y-%m-%d')
-        config['enddate'] = self.params.todate.strftime('%Y-%m-%d')
-        return config
-
     @classmethod
     def from_config(cls, **config):
-        fromdate = config.pop('fromdate', None)
-        if fromdate is not None:
-            fromdate = parse(fromdate)
-
-        todate = config.pop('todate', None)
-        if todate is not None:
-            todate = parse(todate)
-
-        return cls(fromdate=fromdate, todate=todate, **config)
+        return cls(**_parse_dates(config))

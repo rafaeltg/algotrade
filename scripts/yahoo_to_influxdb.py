@@ -99,7 +99,12 @@ if __name__ == "__main__":
     log = logging.getLogger()
     log_console = logging.StreamHandler(sys.stdout)
     log.addHandler(log_console)
-    log.setLevel()
+
+    if args.debug:
+        log.setLevel(logging.DEBUG)
+
+    if args.info:
+        log.setLevel(logging.INFO)
 
     tickers = args.tickers.replace(" ", "").split(',')
 

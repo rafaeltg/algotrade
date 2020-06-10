@@ -1,5 +1,6 @@
 import backtrader as bt
 import backtrader.indicators as btind
+from ..indicators import ZigZag
 
 
 class LongShortStrategy(bt.Strategy):
@@ -28,9 +29,6 @@ class LongShortStrategy(bt.Strategy):
             print('[{}] {}'.format(dt.strftime("%Y-%m-%d %H:%M"), txt))
 
     def __init__(self):
-        # To control operation entries
-        self.orderid = None
-
         if self.p.use_ema:
             self.fast_ma = btind.MovAv.EMA(self.data.close, period=self.p.fast_period)
             self.slow_ma = btind.MovAv.EMA(self.data.close, period=self.p.slow_period)
@@ -39,6 +37,8 @@ class LongShortStrategy(bt.Strategy):
             self.slow_ma = btind.MovAv.SMA(self.data.close, period=self.p.slow_period)
 
         self.signal = btind.CrossOver(self.fast_ma, self.slow_ma)
+
+        self.zz = ZigZag(self.data.close, up_retrace=0.02, down_retrace=-0.02)
 
         self.fast_ma.csv = self.p.csv
         self.slow_ma.csv = self.p.csv
@@ -51,9 +51,6 @@ class LongShortStrategy(bt.Strategy):
         self.log('Backtesting is finished')
 
     def next(self):
-        if self.orderid:
-            return  # if an order is active, no new orders are allowed
-
         if self.signal > 0.0:  # cross upwards
             if self.position:
                 self.log('CLOSE SHORT @ %.2f' % self.data.close[0])
@@ -116,11 +113,8 @@ class LongShortStrategy(bt.Strategy):
                 self.log(selltxt, order.executed.dt)
 
         elif order.status in [order.Expired, order.Canceled, order.Margin]:
-            self.log('%s,' % order.Status[order.status])
+            self.log('%s' % order.Status[order.status])
             pass  # Simply log
-
-        # Allow new orders
-        self.orderid = None
 
     def notify_trade(self, trade):
         if trade.isclosed:

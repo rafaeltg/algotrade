@@ -1,8 +1,8 @@
 import backtrader as bt
 import datetime as dt
-from dateutil.parser import parse
 from influxdb import InfluxDBClient as idbclient
 from influxdb.exceptions import InfluxDBClientError
+from .utils import _parse_dates
 
 TIMEFRAMES = dict(
     (
@@ -21,7 +21,7 @@ class InfluxDB(bt.feeds.DataBase):
 
     params = (
         ('host', '127.0.0.1'),
-        ('port', '8086'),
+        ('port', 8086),
         ('username', None),
         ('password', None),
         ('database', None),
@@ -47,6 +47,7 @@ class InfluxDB(bt.feeds.DataBase):
             )
         except InfluxDBClientError as err:
             print('Failed to establish connection to InfluxDB: %s' % err)
+            raise err
 
         tf = '{multiple}{timeframe}'.format(
             multiple=(self.p.compression if self.p.compression else 1),
@@ -59,12 +60,12 @@ class InfluxDB(bt.feeds.DataBase):
 
         # The query could already consider parameters like fromdate and todate
         # to have the database skip them and not the internal code
-        qstr = ('SELECT mean("{open_f}") AS "open", '
-                'mean("{high_f}") AS "high", '
-                'mean("{low_f}") AS "low", '
-                'mean("{close_f}") AS "close", '
-                'mean("{vol_f}") AS "volume", '
-                'mean("{adjclose_f}") AS "adjclose" '
+        qstr = ('SELECT first("{open_f}") AS "open", '
+                'max("{high_f}") AS "high", '
+                'min("{low_f}") AS "low", '
+                'last("{close_f}") AS "close", '
+                'sum("{vol_f}") AS "volume", '
+                'last("{adjclose_f}") AS "adjclose" '
                 'FROM "{dataname}" '
                 'WHERE time {begin} '
                 'GROUP BY time({timeframe}) fill(none)').format(
@@ -78,10 +79,13 @@ class InfluxDB(bt.feeds.DataBase):
             timeframe=tf,
             begin=st)
 
+        print(qstr)
+
         try:
             dbars = list(self.ndb.query(qstr).get_points())
         except InfluxDBClientError as err:
             print('InfluxDB query failed: %s' % err)
+            raise err
 
         self.biter = iter(dbars)
 
@@ -104,12 +108,4 @@ class InfluxDB(bt.feeds.DataBase):
 
     @classmethod
     def from_config(cls, **config):
-        fromdate = config.pop('fromdate', None)
-        if fromdate is not None:
-            fromdate = parse(fromdate)
-
-        todate = config.pop('todate', None)
-        if todate is not None:
-            todate = parse(todate)
-
-        return cls(fromdate=fromdate, todate=todate, **config)
+        return cls(**_parse_dates(config))

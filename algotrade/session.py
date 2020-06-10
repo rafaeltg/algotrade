@@ -82,9 +82,21 @@ class Session(bt.Cerebro):
             data = [data]
 
         for d in data:
-            df = from_config(config=d, **DATAFEEDS)
-            if df is not None:
-                self.adddata(df)
+            if 'class_name' not in d:
+                continue
+
+            if d['class_name'] == 'ResempleData':
+                cfg = d.get('config', None)
+                if cfg is None:
+                    continue
+
+                df = self.datasbyname.get(cfg.pop('dataname', ''), None)
+                if df is not None:
+                    self.resampledata(df, **cfg)
+            else:
+                df = from_config(config=d, **DATAFEEDS)
+                if df is not None:
+                    self.adddata(df)
 
     def _set_broker(self, b: dict):
         if b is None:

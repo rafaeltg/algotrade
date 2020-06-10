@@ -8,7 +8,7 @@ def run_backtest(args):
     cfg = load_json(args.config)
     s = Session.from_config(**cfg)
     s.run()
-    s.process_plots(outdir=args.out_dir)
+    s.process_plots(outdir=args.out_dir, style='candlestick')
 
 
 def parse_args():
