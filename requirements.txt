@@ -1,6 +1,8 @@
+setuptools
 pandas
 numpy
 backtrader
 requests
 influxdb
 yfinance
+TA-Lib

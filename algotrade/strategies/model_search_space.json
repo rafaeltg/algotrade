@@ -1,0 +1,126 @@
+{
+  "class_name": "Pipeline",
+  "config": {
+    "name": "ridge",
+    "steps": {
+      "class_name": "ListNode",
+      "config": {
+        "label": "steps",
+        "value": [
+          {
+            "class_name": "ChoiceNode",
+            "config": {
+              "label": "",
+              "value": [
+                "passthrough",
+                {
+                  "class_name": "StandardScaler",
+                  "config": {
+                    "name": "scaler"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "class_name": "ChoiceNode",
+            "config": {
+              "label": "",
+              "value": [
+                "passthrough",
+                {
+                  "class_name": "PCA",
+                  "config": {
+                    "n_components": {
+                      "class_name": "IntParameterNode",
+                      "config": {
+                        "label": "n_components",
+                        "max_val": 100,
+                        "min_val": 5
+                      }
+                    },
+                    "name": "pca",
+                    "whiten": {
+                      "class_name": "BooleanParameterNode",
+                      "config": {
+                        "label": "whiten"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "class_name": "ChoiceNode",
+            "config": {
+              "label": "",
+              "value": [
+                {
+                  "class_name": "Ridge",
+                  "config": {
+                    "alpha": {
+                      "class_name": "FloatParameterNode",
+                      "config": {
+                        "label": "alpha",
+                        "max_val": 10.0,
+                        "min_val": 0.001
+                      }
+                    },
+                    "max_iter": {
+                      "class_name": "IntParameterNode",
+                      "config": {
+                        "label": "max_iter",
+                        "max_val": 10000,
+                        "min_val": 100
+                      }
+                    },
+                    "name": "ridge",
+                    "tol": {
+                      "class_name": "FloatParameterNode",
+                      "config": {
+                        "label": "tol",
+                        "max_val": 0.1,
+                        "min_val": 0.0001
+                      }
+                    }
+                  }
+                },
+                {
+                  "class_name": "Lasso",
+                  "config": {
+                    "alpha": {
+                      "class_name": "FloatParameterNode",
+                      "config": {
+                        "label": "alpha",
+                        "max_val": 10.0,
+                        "min_val": 0.001
+                      }
+                    },
+                    "max_iter": {
+                      "class_name": "IntParameterNode",
+                      "config": {
+                        "label": "max_iter",
+                        "max_val": 10000,
+                        "min_val": 100
+                      }
+                    },
+                    "name": "lasso",
+                    "tol": {
+                      "class_name": "FloatParameterNode",
+                      "config": {
+                        "label": "tol",
+                        "max_val": 0.1,
+                        "min_val": 0.0001
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+}

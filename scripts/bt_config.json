@@ -1,14 +1,13 @@
 {
   "data": [
     {
-      "class_name": "InfluxDB",
+      "class_name": "YahooFinanceCSVData",
       "config": {
-        "username": "user",
-        "password": "123mudar",
-        "database": "instruments",
-        "dataname": "SPY",
-        "fromdate": "2017-01-01",
-        "timeframe": 5
+        "dataname": "/work/algotrade/data/SPY_2015-01-02_2020-04-30.csv",
+        "fromdate": "2016-01-01",
+        "timeframe": 5,
+        "sessionend": "00:00",
+        "name": "SPY"
       }
     }
   ],
@@ -20,14 +19,10 @@
   },
   "strategy": [
     {
-      "class_name": "LongShortStrategy",
+      "class_name": "MLModelStrategy",
       "params": {
-        "fast_period": 10,
-        "slow_period": 30,
-        "trail": true,
-        "onlylong": true,
         "printout": true,
-        "csvcross": true
+        "csv": true
       }
     }
   ],
@@ -51,6 +46,7 @@
     {
       "class_name": "WriterFile",
       "params": {
+        "csv": true,
         "rounding": 2
       }
     }

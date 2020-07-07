@@ -1,6 +1,5 @@
 import backtrader as bt
 import backtrader.indicators as btind
-from ..indicators import ZigZag
 
 
 class LongShortStrategy(bt.Strategy):
@@ -37,8 +36,6 @@ class LongShortStrategy(bt.Strategy):
             self.slow_ma = btind.MovAv.SMA(self.data.close, period=self.p.slow_period)
 
         self.signal = btind.CrossOver(self.fast_ma, self.slow_ma)
-
-        self.zz = ZigZag(self.data.close, up_retrace=0.02, down_retrace=-0.02)
 
         self.fast_ma.csv = self.p.csv
         self.slow_ma.csv = self.p.csv
